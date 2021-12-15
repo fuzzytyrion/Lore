@@ -1,3 +1,4 @@
+using Lore.Api;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,5 +22,10 @@ app.UseSwaggerUI(c =>
 });    
 
 app.MapGet("/", () => "Hello World!");
+app.MapGet("/todos/{id}", (int id) => Db.GetTodo(id));
+app.MapGet("/todos", () => Db.GetTodos());
+app.MapPost("/todos", (Todo todo) => Db.CreateTodo(todo));
+app.MapPut("/todos", (Todo todo) => Db.UpdateTodo(todo));
+app.MapDelete("/todos/{id}", (int id) => Db.RemoveTodo(id));
 
 app.Run();
