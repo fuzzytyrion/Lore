@@ -4,6 +4,8 @@ using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("Todos") ?? "Data Source=Todos.db";
+builder.Services.AddSqlite<TodoDb>(connectionString);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<TodoDb>(options => options.UseInMemoryDatabase("items"));
 builder.Services.AddSwaggerGen(c =>
