@@ -26,9 +26,29 @@ app.UseSwaggerUI(c =>
 
 app.MapGet("/", () => "Hello World!");
 app.MapGet("/todos", async (TodoDb db) => await db.Todos.ToListAsync());
-//app.MapGet("/todos/{id}", (int id) => Db.GetTodo(id));
-//app.MapPost("/todos", (Todo todo) => Db.CreateTodo(todo));
-//app.MapPut("/todos", (Todo todo) => Db.UpdateTodo(todo));
-//app.MapDelete("/todos/{id}", (int id) => Db.RemoveTodo(id));
+app.MapGet("/todos/{id}", async (TodoDb db, int id) => await db.Todos.FindAsync(id));
+app.MapPost("/todos", async(TodoDb db, Todo todo) =>
+{
+    await db.Todos.AddAsync(todo);
+    db.SaveChanges();
+    return Results.Created($"/todos/{todo.Id}", todo);
+});
+app.MapPut("/todos/{id}", async (TodoDb db, Todo updateTodo, int id) =>
+{
+    var todo = await db.Todos.FindAsync(id);
+    if (todo == null) return Results.NotFound();
+    todo.Name = updateTodo.Name;
+    todo.Description = updateTodo.Description;
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+app.MapDelete("/todos/{id}", async (TodoDb db, int id) =>
+{
+    var todo = await db.Todos.FindAsync(id);
+    if (todo == null) return Results.NotFound();
+    db.Todos.Remove(todo);
+    await db.SaveChangesAsync();
+    return Results.Ok();
+});
 
 app.Run();
