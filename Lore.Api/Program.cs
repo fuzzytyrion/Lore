@@ -23,13 +23,16 @@ if (app.Environment.IsDevelopment())
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Lore API V1");   
-});    
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Lore API V1");
+});
 
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/", () => "Hello World!")
+    .WithName("Hello")
+    .WithTags("Turnip");
+
 app.MapGet("/todos", async (TodoDb db) => await db.Todos.ToListAsync());
 app.MapGet("/todos/{id}", async (TodoDb db, int id) => await db.Todos.FindAsync(id));
-app.MapPost("/todos", async(TodoDb db, Todo todo) =>
+app.MapPost("/todos", async (TodoDb db, Todo todo) =>
 {
     await db.Todos.AddAsync(todo);
     db.SaveChanges();
