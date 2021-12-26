@@ -7,12 +7,12 @@ public static class TodoApi
     {
                 
         app.MapGet("/todos", async (TodoDb db) => await db.Todos.ToListAsync())
-            .Produces<List<Todo>>()
+            .Produces<List<Todo>>(StatusCodes.Status200OK)
             .WithName("GetAllTodos")
             .WithTags("Getters", "Todos");
 
         app.MapGet("/todos/{id}", async (TodoDb db, int id) => await db.Todos.FindAsync(id))
-            .Produces<Todo>()
+            .Produces<Todo>(StatusCodes.Status200OK)
             .WithName("GetTodo")
             .WithTags("Getters", "Todos");
 
@@ -21,7 +21,8 @@ public static class TodoApi
             await db.Todos.AddAsync(todo);
             db.SaveChanges();
             return Results.Created($"/todos/{todo.Id}", todo);
-        }).WithName("CreateTodo")
+        }).Produces<Todo>(StatusCodes.Status201Created)
+            .WithName("CreateTodo")
             .WithTags("Setters", "Todos");
 
         app.MapPut("/todos/{id}", async (TodoDb db, Todo updateTodo, int id) =>
@@ -32,7 +33,9 @@ public static class TodoApi
             todo.Description = updateTodo.Description;
             await db.SaveChangesAsync();
             return Results.NoContent();
-        }).WithName("UpdateTodo")
+        }).Produces<Todo>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithName("UpdateTodo")
             .WithTags("Setters", "Todos");
 
         app.MapDelete("/todos/{id}", async (TodoDb db, int id) =>
@@ -42,7 +45,9 @@ public static class TodoApi
             db.Todos.Remove(todo);
             await db.SaveChangesAsync();
             return Results.Ok();
-        }).WithName("DeleteTodo")
+        }).Produces<Todo>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithName("DeleteTodo")
             .WithTags("Setters", "Todos");
 
     }
